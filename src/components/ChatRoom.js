@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import MessageItem from './MessageItem';
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import MessageItem from "./MessageItem";
 
-function ChatRoom(props) {
+function ChatRoom({ rooms, createNewMessage }) {
   const roomSlug = useParams().roomSlug;
-  const room = props.rooms.find((room) => room.slug === roomSlug);
+  const room = rooms.find((room) => room.slug === roomSlug);
   const messagesList = room.messages.map((msg) => {
     return <MessageItem msg={msg.msg} />;
   });
-  const [msg, setMsg] = useState({ msg: '' });
+  const [msg, setMsg] = useState({ msg: "" });
   const handleChange = (event) => {
     setMsg({ ...msg, [event.target.name]: event.target.value });
   };
   const handleSubmit = (event) => {
-
-
+    event.preventDefault();
+    createNewMessage(msg, room);
   };
 
   return (

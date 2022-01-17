@@ -8,6 +8,7 @@ import axios from "axios";
 
 function App() {
   const [rooms, setRooms] = useState([]);
+
   useEffect(() => fetchRoom(), []);
 
   const fetchRoom = async () => {
@@ -35,14 +36,20 @@ function App() {
     }
     // to do : call BE to create a room
   };
+
   const updateRoom = async (updatedRoom) => {
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://coded-task-axios-be.herokuapp.com/rooms/${updatedRoom.id}`,
         updatedRoom
       );
-      let tempstudent = rooms.find((room) => room.id === rooms.id);
-      for (const key in tempstudent) tempstudent[key] = updatedRoom[key];
+      // const tempRoom = rooms.find((room) => room.id === updatedRoom.id);
+      setRooms(
+        rooms.map((room) =>
+          room.id === updatedRoom.id ? (room = updatedRoom) : room
+        )
+      );
+      // for (const key in tempRoom) tempRoom[key] = updatedRoom[key];
     } catch (e) {
       alert("cannot update new room");
       console.log(e);
@@ -52,15 +59,29 @@ function App() {
 
   const deleteRoom = async (id) => {
     try {
-      const respones = await axios.delete(
+      await axios.delete(
         `https://coded-task-axios-be.herokuapp.com/rooms/${id}`
       );
-      let tempstudent = rooms.filter((room) => room.id !== rooms.id);
-      setRooms(tempstudent);
+      setRooms(rooms.filter((room) => room.id !== id));
     } catch (e) {
       alert("cannot delete the room");
     }
     // to do : call BE to delete a room
+  };
+
+  const createNewMessage = async (msg, room) => {
+    console.log(msg);
+    try {
+      const response = await axios.post(
+        `https://coded-task-axios-be.herokuapp.com/rooms/msg/${room.id}`,
+        msg
+      );
+
+      console.log(rooms);
+      setRooms([...room, msg]);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -68,7 +89,7 @@ function App() {
       <div className="main__chatbody">
         <Switch>
           <Route path="/room/:roomSlug">
-            <ChatRoom rooms={rooms} />
+            <ChatRoom rooms={rooms} createNewMessage={createNewMessage} />
           </Route>
           <Route exact path="/">
             <center>
